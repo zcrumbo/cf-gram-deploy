@@ -20,8 +20,10 @@ const app = express();
 
 mongoose.connect(process.env.MONGODB_URI);//putting this inside .env
 
+let morganFormat = process.env.PRODUCTION ? 'common' : 'dev';
+
 app.use(cors());
-app.use(morgan('dev'));
+app.use(morgan(morganFormat));
 app.use(authRouter);
 app.use(galleryRouter);
 app.use(picRouter);

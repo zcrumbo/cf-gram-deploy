@@ -1,8 +1,10 @@
 'use strict';
+require('./lib/test-env.js');
 
 const expect = require('chai').expect;
 const request = require('superagent');
 const debug = require('debug')('cfgram:pic-route-test');
+const awsMocks = require('./lib/aws-mocks.js');
 
 const User = require('../model/user.js');
 const Pic = require('../model/pic.js');
@@ -39,10 +41,10 @@ describe('Pic routes', function() {
   });
   afterEach( done => {
     Promise.all([
-    Pic.remove({}),
-    User.remove({}),
-    Gallery.remove({})
-    ])
+      Pic.remove({}),
+      User.remove({}),
+      Gallery.remove({})
+     ])
     .then( () => done())
     .catch(done);
   });
@@ -89,9 +91,12 @@ describe('Pic routes', function() {
         .attach('image', examplePic.image) //superagent methods, all of em
         .end(( err, res) => {
           if (err) return done(err);
+
+          console.log('location prop:', awsMocks.uploadMock.Location);
           expect(res.body.name).to.equal(examplePic.name);
           expect(res.body.desc).to.equal(examplePic.desc);
           expect(res.body.galleryID).to.equal(this.tempGallery._id.toString());
+          expect(res.body.imageURI).to.equal(awsMocks.uploadMock.Location);
           done();
         });
       });
